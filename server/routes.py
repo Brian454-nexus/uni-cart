@@ -1,9 +1,10 @@
 from flask import Blueprint, request, jsonify
-from .models import db, User
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from .models import db, User, Category, Item
 from datetime import datetime
 
 auth_bp = Blueprint('auth', __name__)
+api = Blueprint('api', __name__)
 
 @auth_bp.route('/api/signup', methods=['POST'])
 def signup():
@@ -46,3 +47,23 @@ def me():
     if not user:
         return jsonify({'error': 'User not found'}), 404
     return jsonify({'user': user.as_dict()}), 200
+
+@api.route('/categories', methods=['GET'])
+def get_categories():
+    categories = Category.query.all()
+    return jsonify([{'id': c.id, 'name': c.name} for c in categories])
+
+@api.route('/items', methods=['GET'])
+def get_items():
+    category_id = request.args.get('category_id')
+    if category_id:
+        items = Item.query.filter_by(category_id=category_id).all()
+    else:
+        items = Item.query.all()
+    return jsonify([{
+        'id': i.id,
+        'name': i.name,
+        'description': i.description,
+        'price': i.price,
+        'category_id': i.category_id
+    } for i in items])
