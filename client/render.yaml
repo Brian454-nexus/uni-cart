@@ -1,7 +1,0 @@
-services:
-  - type: web
-    name: unicart-frontend
-    env: static
-    buildCommand: "npm install && npm run build"
-    staticPublishPath: "build"
-    plan: free 
