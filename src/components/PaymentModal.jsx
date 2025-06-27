@@ -65,37 +65,46 @@ const PaymentModal = ({ isOpen, onClose, product }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-        <div className="flex items-center justify-between p-6 border-b">
-          <h3 className="text-lg font-semibold">Buy Now - Pay</h3>
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4 animate-fade-in">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full border border-indigo-100 relative transition-transform duration-300 animate-scale-in">
+        <button
+          onClick={handleClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-indigo-600 focus:outline-none"
+        >
+          <X className="w-6 h-6" />
+        </button>
+        <div className="flex items-center justify-between p-6 border-b border-indigo-50">
+          <h3 className="text-xl font-bold text-indigo-700">Buy Now</h3>
         </div>
 
         {step === "phone" && (
-          <div className="space-y-4">
+          <div className="space-y-6 px-6 py-8">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-indigo-700 mb-2">
                 Email Address
               </label>
               <Input
                 type="email"
-                placeholder="Enter your email"
+                placeholder="e.g. student@university.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mb-2"
+                className="mb-4 rounded-lg border-indigo-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               />
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-indigo-700 mb-2">
                 Amount
               </label>
               <Input
                 type="text"
                 value={formatPrice(product.price)}
                 disabled
-                className="mb-2"
+                className="mb-2 rounded-lg border-indigo-100 bg-indigo-50 text-indigo-700 font-semibold"
               />
             </div>
             {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-            <Button onClick={handlePayment} className="w-full" size="lg">
+            <Button
+              onClick={handlePayment}
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow font-semibold text-lg transition-all duration-200"
+            >
               Pay with Paystack
             </Button>
           </div>

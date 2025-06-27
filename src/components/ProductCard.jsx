@@ -71,8 +71,8 @@ const ProductCard = ({ product }) => {
             {product.condition.charAt(0).toUpperCase() +
               product.condition.slice(1).replace("-", " ")}
           </div>
-          {/* Like & Share Buttons */}
-          <div className="absolute top-2 right-2 flex flex-col gap-2 z-10">
+          {/* Like & Share Buttons - moved lower for better spacing */}
+          <div className="absolute bottom-2 right-2 flex flex-col gap-2 z-10 opacity-80 group-hover:opacity-100 transition-all">
             <button
               onClick={handleLike}
               className="bg-white rounded-full p-1 shadow hover:bg-blue-50"
