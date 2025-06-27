@@ -1,5 +1,4 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
@@ -10,10 +9,10 @@ from .config import Config
 from .routes import auth_bp, users_bp, products_bp, categories_bp, transactions_bp, payments_bp, root_bp
 from flasgger import Swagger
 from flask_socketio import SocketIO
+from .extensions import db  # import db from extensions
 
 # Extensions
 ma = Marshmallow()
-db = SQLAlchemy()
 jwt = JWTManager()
 migrate = Migrate()
 celery = Celery(__name__)

@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 from .models import LikedProduct, Message, Product, Category
 from .schemas import LikedProductSchema, MessageSchema
 from . import socketio
-from . import db
+from .extensions import db
 from flask_socketio import emit, join_room
 from sqlalchemy import or_, and_
 import requests
