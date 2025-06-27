@@ -125,9 +125,9 @@ const ProductDetail = () => {
               />
             </div>
 
-            {product.images.length > 1 && (
+            {product.images && product.images.length > 1 && (
               <div className="flex space-x-2 overflow-x-auto pb-2">
-                {product.images.map((image, index) => (
+                {(product.images || []).map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
@@ -273,13 +273,13 @@ const ProductDetail = () => {
         </div>
 
         {/* Similar Products */}
-        {similarProducts.length > 0 && (
+        {similarProducts && similarProducts.length > 0 && (
           <div className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">
               Similar Products
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {similarProducts.map((similarProduct) => (
+              {(similarProducts || []).map((similarProduct) => (
                 <Link
                   key={similarProduct.id}
                   to={`/product/${similarProduct.id}`}

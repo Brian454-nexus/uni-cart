@@ -18,12 +18,12 @@ const CategorySidebar = ({ selectedCategory, onCategoryChange }) => {
           <div className="flex items-center justify-between">
             <span>All Categories</span>
             <span className="text-sm text-gray-500">
-              {categories.reduce((sum, cat) => sum + cat.count, 0)}
+              {(categories || []).reduce((sum, cat) => sum + (cat.count || 0), 0)}
             </span>
           </div>
         </button>
         
-        {categories.map((category) => (
+        {(categories || []).map((category) => (
           <button
             key={category.id}
             onClick={() => onCategoryChange(category.id)}

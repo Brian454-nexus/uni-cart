@@ -5,7 +5,14 @@ import CategoryDropdown from "../components/CategoryDropdown";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Filter, Search, ShoppingBag, Heart, TrendingUp, Star } from "lucide-react";
+import {
+  Filter,
+  Search,
+  ShoppingBag,
+  Heart,
+  TrendingUp,
+  Star,
+} from "lucide-react";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -17,7 +24,7 @@ const Dashboard = () => {
   const [stats, setStats] = useState({
     totalProducts: 0,
     totalCategories: 0,
-    trendingProducts: 0
+    trendingProducts: 0,
   });
 
   // Fetch products from backend
@@ -28,18 +35,18 @@ const Dashboard = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('/api/products', {
+      const response = await fetch("/api/products", {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('unicart_token')}`
-        }
+          Authorization: `Bearer ${localStorage.getItem("unicart_token")}`,
+        },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setProducts(data.products || []);
       }
     } catch (error) {
-      console.error('Failed to fetch products:', error);
+      console.error("Failed to fetch products:", error);
     } finally {
       setLoading(false);
     }
@@ -47,37 +54,38 @@ const Dashboard = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('/api/dashboard/stats', {
+      const response = await fetch("/api/dashboard/stats", {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('unicart_token')}`
-        }
+          Authorization: `Bearer ${localStorage.getItem("unicart_token")}`,
+        },
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setStats(data);
       }
     } catch (error) {
-      console.error('Failed to fetch stats:', error);
+      console.error("Failed to fetch stats:", error);
     }
   };
 
   // Enhanced search: filter by name or category
   const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      const matchesCategory = selectedCategory
-        ? product.category === selectedCategory
-        : true;
-      const matchesSearch = search.trim()
-        ? product.title.toLowerCase().includes(search.toLowerCase()) ||
-          product.category.toLowerCase().includes(search.toLowerCase())
-        : true;
+    return (products || []).filter((product) => {
+      const matchesCategory =
+        !selectedCategory || product.category === selectedCategory;
+      const matchesSearch =
+        !search ||
+        product.title.toLowerCase().includes(search.toLowerCase()) ||
+        product.description.toLowerCase().includes(search.toLowerCase());
       return matchesCategory && matchesSearch;
     });
   }, [selectedCategory, search, products]);
 
   // Get featured products
-  const featuredProducts = products.filter((product) => product.featured).slice(0, 3);
+  const featuredProducts = (products || [])
+    .filter((product) => product.featured)
+    .slice(0, 3);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -103,7 +111,7 @@ const Dashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold mb-2">
-                Welcome back, {user?.name?.split(' ')[0]}! 👋
+                Welcome back, {user?.name?.split(" ")[0]}! 👋
               </h1>
               <p className="text-blue-100">
                 Discover amazing deals from fellow students
@@ -128,8 +136,12 @@ const Dashboard = () => {
                   <ShoppingBag className="w-6 h-6 text-blue-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Products</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalProducts}</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    Total Products
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {stats.totalProducts}
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -142,8 +154,12 @@ const Dashboard = () => {
                   <Filter className="w-6 h-6 text-purple-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Categories</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalCategories}</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    Categories
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {stats.totalCategories}
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -157,7 +173,9 @@ const Dashboard = () => {
                 </div>
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Trending</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.trendingProducts}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {stats.trendingProducts}
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -179,7 +197,7 @@ const Dashboard = () => {
                 />
               </form>
             </div>
-            
+
             <div className="flex gap-3">
               <CategoryDropdown
                 selectedCategory={selectedCategory}
@@ -241,7 +259,7 @@ const Dashboard = () => {
         </div>
 
         {/* Featured Products */}
-        {featuredProducts.length > 0 && (
+        {(featuredProducts || []).length > 0 && (
           <div className="mb-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center">
@@ -250,7 +268,7 @@ const Dashboard = () => {
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredProducts.map((product) => (
+              {(featuredProducts || []).map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
@@ -261,24 +279,30 @@ const Dashboard = () => {
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">
-              {selectedCategory ? `${selectedCategory} Products` : 'All Products'}
+              {selectedCategory
+                ? `${selectedCategory} Products`
+                : "All Products"}
             </h2>
             <p className="text-gray-600">
-              {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found
+              {(filteredProducts || []).length} product
+              {(filteredProducts || []).length !== 1 ? "s" : ""} found
             </p>
           </div>
 
-          {filteredProducts.length === 0 ? (
+          {(filteredProducts || []).length === 0 ? (
             <div className="text-center py-12">
               <ShoppingBag className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No products found
+              </h3>
               <p className="text-gray-600">
-                Try adjusting your search or filters to find what you're looking for.
+                Try adjusting your search or filters to find what you're looking
+                for.
               </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredProducts.map((product) => (
+              {(filteredProducts || []).map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
@@ -289,4 +313,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

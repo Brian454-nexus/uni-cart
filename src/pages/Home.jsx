@@ -13,7 +13,7 @@ const Home = () => {
 
   // Enhanced search: filter by name or category
   const filteredProducts = useMemo(() => {
-    return allProducts.filter((product) => {
+    return (allProducts || []).filter((product) => {
       const matchesCategory = selectedCategory
         ? product.category === selectedCategory
         : true;
@@ -26,10 +26,12 @@ const Home = () => {
   }, [selectedCategory, search, allProducts]);
 
   // Get featured products
-  let featuredProducts = mockProducts.filter((product) => product.featured);
+  let featuredProducts = (mockProducts || []).filter(
+    (product) => product.featured
+  );
   if (featuredProducts.length < 3) {
     // Add non-featured products to fill up to 3, avoiding duplicates
-    const nonFeatured = mockProducts.filter(
+    const nonFeatured = (mockProducts || []).filter(
       (product) =>
         !product.featured && !featuredProducts.some((f) => f.id === product.id)
     );
@@ -100,7 +102,7 @@ const Home = () => {
                 />
               </form>
             </div>
-            
+
             <div className="flex gap-3">
               <CategoryDropdown
                 selectedCategory={selectedCategory}
@@ -164,10 +166,12 @@ const Home = () => {
         {/* Featured Products */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Featured Products</h2>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Featured Products
+            </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredProducts.map((product) => (
+            {(featuredProducts || []).map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
@@ -177,26 +181,32 @@ const Home = () => {
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">
-              {selectedCategory ? `${selectedCategory} Products` : 'All Products'}
+              {selectedCategory
+                ? `${selectedCategory} Products`
+                : "All Products"}
             </h2>
             <p className="text-gray-600">
-              {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found
+              {(filteredProducts || []).length} product
+              {(filteredProducts || []).length !== 1 ? "s" : ""} found
             </p>
           </div>
 
-          {filteredProducts.length === 0 ? (
+          {(filteredProducts || []).length === 0 ? (
             <div className="text-center py-12">
               <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Search className="w-8 h-8 text-gray-400" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No products found
+              </h3>
               <p className="text-gray-600">
-                Try adjusting your search or filters to find what you're looking for.
+                Try adjusting your search or filters to find what you're looking
+                for.
               </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredProducts.map((product) => (
+              {(filteredProducts || []).map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>

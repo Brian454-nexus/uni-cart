@@ -47,7 +47,7 @@ const AppContent = () => {
   return (
     <Router>
       <div className="App">
-        <Header />
+            <Header />
         
         {/* Onboarding Modal for new users */}
         {!user && (
@@ -65,10 +65,10 @@ const AppContent = () => {
           />
         )}
 
-        <Routes>
+            <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/" element={<Home />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
           
           {/* Protected Buyer Routes */}
           <Route 
@@ -123,9 +123,9 @@ const AppContent = () => {
           />
 
           {/* 404 Route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </div>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
     </Router>
   );
 };
@@ -135,8 +135,8 @@ const App = () => {
   return (
     <AuthProvider>
       <AppContent />
-    </AuthProvider>
-  );
+      </AuthProvider>
+);
 };
 
 export default App;

@@ -195,7 +195,7 @@ const SellerProducts = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProducts.map((product) => (
+            {(filteredProducts || []).map((product) => (
               <Card key={product.id} className="overflow-hidden">
                 <div className="aspect-square bg-gray-100">
                   <img
@@ -296,19 +296,19 @@ const SellerProducts = () => {
                 </div>
                 <div className="text-center">
                   <p className="text-2xl font-bold text-green-600">
-                    {products.filter(p => p.available).length}
+                    {(products || []).filter(p => p.available).length}
                   </p>
                   <p className="text-sm text-gray-600">Available</p>
                 </div>
                 <div className="text-center">
                   <p className="text-2xl font-bold text-gray-600">
-                    {products.filter(p => !p.available).length}
+                    {(products || []).filter(p => !p.available).length}
                   </p>
                   <p className="text-sm text-gray-600">Unavailable</p>
                 </div>
                 <div className="text-center">
                   <p className="text-2xl font-bold text-orange-600">
-                    {products.reduce((sum, p) => sum + (p.views || 0), 0)}
+                    {(products || []).reduce((sum, p) => sum + (p.views || 0), 0)}
                   </p>
                   <p className="text-sm text-gray-600">Total Views</p>
                 </div>
