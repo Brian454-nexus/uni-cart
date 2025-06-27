@@ -17,3 +17,5 @@ python-dotenv
 gunicorn
 flask-socketio
 eventlet
+SQLAlchemy
+marshmallow
