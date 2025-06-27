@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
+const API_BASE = "/backend/api/auth";
+
 const AuthContext = createContext(undefined);
 
 export const useAuth = () => {
@@ -27,29 +29,31 @@ export const AuthProvider = ({ children }) => {
 
   const validateToken = async (token) => {
     try {
-      const response = await fetch("/api/auth/validate", {
+      const response = await fetch(`${API_BASE}/validate`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
-
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
-
-        // If user hasn't completed onboarding, show it
-        if (!userData.onboarding_completed) {
-          setShowOnboarding(true);
-        }
-      } else {
-        // Token invalid, remove it
+      if (!response.ok) {
         localStorage.removeItem("unicart_token");
+        localStorage.removeItem("user_data");
+        setUser(null);
+        setShowOnboarding(false);
+        return;
+      }
+      const data = await response.json();
+      setUser(data.user);
+      localStorage.setItem("user_data", JSON.stringify(data.user));
+      if (!data.user.onboarding_completed) {
+        setShowOnboarding(true);
       }
     } catch (error) {
-      console.error("Token validation failed:", error);
       localStorage.removeItem("unicart_token");
+      localStorage.removeItem("user_data");
+      setUser(null);
+      setShowOnboarding(false);
     } finally {
       setLoading(false);
     }
@@ -58,30 +62,26 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     setLoading(true);
     try {
-      const response = await fetch("/api/auth/register", {
+      const response = await fetch(`${API_BASE}/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(userData),
       });
-
       if (!response.ok) {
-        throw new Error("Registration failed");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Registration failed");
       }
-
       const { token, user: newUser } = await response.json();
-
       localStorage.setItem("unicart_token", token);
+      localStorage.setItem("user_data", JSON.stringify(newUser));
       setUser(newUser);
-
-      // Show onboarding after registration
       setShowOnboarding(true);
-
       return { success: true };
     } catch (error) {
       console.error("Registration error:", error);
-      throw new Error("Registration failed");
+      throw new Error(error.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -90,27 +90,27 @@ export const AuthProvider = ({ children }) => {
   const completeOnboarding = async (onboardingData) => {
     setLoading(true);
     try {
-      const response = await fetch("/api/auth/onboarding", {
+      const token = localStorage.getItem("unicart_token");
+      const response = await fetch(`${API_BASE}/onboarding`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("unicart_token")}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(onboardingData),
       });
-
       if (!response.ok) {
-        throw new Error("Onboarding failed");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Onboarding failed");
       }
-
       const updatedUser = await response.json();
-      setUser(updatedUser);
+      setUser(updatedUser.user);
+      localStorage.setItem("user_data", JSON.stringify(updatedUser.user));
       setShowOnboarding(false);
-
       return { success: true };
     } catch (error) {
       console.error("Onboarding error:", error);
-      throw new Error("Onboarding failed");
+      throw new Error(error.message || "Onboarding failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -119,32 +119,28 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     setLoading(true);
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch(`${API_BASE}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
       });
-
       if (!response.ok) {
-        throw new Error("Login failed");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Login failed");
       }
-
       const { token, user: userData } = await response.json();
-
       localStorage.setItem("unicart_token", token);
+      localStorage.setItem("user_data", JSON.stringify(userData));
       setUser(userData);
-
-      // If user hasn't completed onboarding, show it
       if (!userData.onboarding_completed) {
         setShowOnboarding(true);
       }
-
       return { success: true };
     } catch (error) {
       console.error("Login error:", error);
-      throw new Error("Login failed");
+      throw new Error(error.message || "Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -152,6 +148,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem("unicart_token");
+    localStorage.removeItem("user_data");
     setUser(null);
     setShowOnboarding(false);
   };

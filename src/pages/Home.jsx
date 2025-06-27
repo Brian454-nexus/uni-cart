@@ -1,7 +1,9 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { mockProducts, categories } from "../data/mockData";
 import ProductCard from "../components/ProductCard";
 import CategoryDropdown from "../components/CategoryDropdown";
+import OnboardingModal from "../components/OnboardingModal";
+import { useAuth } from "../contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Filter, Search } from "lucide-react";
 
@@ -10,6 +12,20 @@ const Home = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [search, setSearch] = useState("");
   const [allProducts, setAllProducts] = useState(mockProducts);
+  const [showOnboardingModal, setShowOnboardingModal] = useState(false);
+
+  const { user, showOnboarding } = useAuth();
+
+  // Show onboarding modal after 5 seconds if user is not logged in
+  useEffect(() => {
+    if (!user && !showOnboarding) {
+      const timer = setTimeout(() => {
+        setShowOnboardingModal(true);
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [user, showOnboarding]);
 
   // Enhanced search: filter by name or category
   const filteredProducts = useMemo(() => {
@@ -43,6 +59,12 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Onboarding Modal */}
+      <OnboardingModal
+        isOpen={showOnboardingModal}
+        onClose={() => setShowOnboardingModal(false)}
+      />
+
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

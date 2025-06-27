@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Header from "./components/Header";
 import Home from "./pages/Home";
@@ -11,7 +16,6 @@ import SellerInbox from "./pages/seller/SellerInbox";
 import ProductDetail from "./pages/ProductDetail";
 import LikedProducts from "./pages/LikedProducts";
 import NotFound from "./pages/NotFound";
-import OnboardingModal from "./components/OnboardingModal";
 import OnboardingWizard from "./components/OnboardingWizard";
 
 // Protected Route Component
@@ -47,85 +51,77 @@ const AppContent = () => {
   return (
     <Router>
       <div className="App">
-            <Header />
-        
-        {/* Onboarding Modal for new users */}
-        {!user && (
-          <OnboardingModal 
-            isOpen={true} 
-            onClose={() => {}} 
-          />
-        )}
+        <Header />
 
         {/* Onboarding Wizard for users who haven't completed onboarding */}
         {user && showOnboarding && (
-          <OnboardingWizard 
-            isOpen={showOnboarding} 
-            onClose={() => setShowOnboarding(false)} 
+          <OnboardingWizard
+            isOpen={showOnboarding}
+            onClose={() => setShowOnboarding(false)}
           />
         )}
 
-            <Routes>
+        <Routes>
           {/* Public Routes */}
-              <Route path="/" element={<Home />} />
-              <Route path="/product/:id" element={<ProductDetail />} />
-          
+          <Route path="/" element={<Home />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
+
           {/* Protected Buyer Routes */}
-          <Route 
-            path="/dashboard" 
+          <Route
+            path="/dashboard"
             element={
-              <ProtectedRoute allowedRoles={['buyer']}>
+              <ProtectedRoute allowedRoles={["buyer"]}>
                 <Dashboard />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/liked-products" 
+          <Route
+            path="/liked-products"
             element={
-              <ProtectedRoute allowedRoles={['buyer']}>
+              <ProtectedRoute allowedRoles={["buyer"]}>
                 <LikedProducts />
               </ProtectedRoute>
-            } 
+            }
           />
 
           {/* Protected Seller Routes */}
-          <Route 
-            path="/seller/dashboard" 
+          <Route
+            path="/seller/dashboard"
             element={
-              <ProtectedRoute allowedRoles={['seller']}>
+              <ProtectedRoute allowedRoles={["seller"]}>
                 <SellerDashboard />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/seller/products" 
+          <Route
+            path="/seller/products"
             element={
-              <ProtectedRoute allowedRoles={['seller']}>
+              <ProtectedRoute allowedRoles={["seller"]}>
                 <SellerProducts />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/seller/add" 
+          <Route
+            path="/seller/add"
             element={
-              <ProtectedRoute allowedRoles={['seller']}>
+              <ProtectedRoute allowedRoles={["seller"]}>
                 <AddProduct />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/seller/inbox" 
+          <Route
+            path="/seller/inbox"
             element={
-              <ProtectedRoute allowedRoles={['seller']}>
+              <ProtectedRoute allowedRoles={["seller"]}>
                 <SellerInbox />
               </ProtectedRoute>
-            } 
+            }
           />
 
           {/* 404 Route */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </div>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
     </Router>
   );
 };
@@ -135,8 +131,8 @@ const App = () => {
   return (
     <AuthProvider>
       <AppContent />
-      </AuthProvider>
-);
+    </AuthProvider>
+  );
 };
 
 export default App;

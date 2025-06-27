@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Eye, EyeOff, ShoppingCart } from "lucide-react";
+import { Eye, EyeOff, ShoppingCart, X } from "lucide-react";
 
 const OnboardingModal = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
@@ -30,6 +30,10 @@ const OnboardingModal = ({ isOpen, onClose }) => {
       ...prev,
       [name]: value,
     }));
+    // Clear error when user starts typing
+    if (error) {
+      setError("");
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -37,6 +41,21 @@ const OnboardingModal = ({ isOpen, onClose }) => {
     setError("");
 
     // Validation
+    if (!formData.name.trim()) {
+      setError("Please enter your full name");
+      return;
+    }
+
+    if (!formData.email.trim()) {
+      setError("Please enter your email address");
+      return;
+    }
+
+    if (!formData.email.includes("@")) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       return;
@@ -50,25 +69,42 @@ const OnboardingModal = ({ isOpen, onClose }) => {
     setLoading(true);
     try {
       await register({
-        name: formData.name,
-        email: formData.email,
+        name: formData.name.trim(),
+        email: formData.email.trim().toLowerCase(),
         password: formData.password,
       });
 
       // Modal will close automatically when onboarding starts
-      onClose();
+      // No need to call onClose() here as the AuthContext will handle it
     } catch (err) {
-      setError(err.message || "Registration failed");
+      setError(err.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleClose = () => {
+    setError("");
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    });
+    onClose();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md backdrop-blur-sm bg-opacity-60">
         <DialogHeader>
-          <DialogTitle className="text-center">
+          <DialogTitle className="text-center relative">
+            <button
+              onClick={handleClose}
+              className="absolute top-0 right-0 p-2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
             <div className="flex items-center justify-center space-x-2 mb-4">
               <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
                 <ShoppingCart className="w-7 h-7 text-white" />
@@ -104,6 +140,7 @@ const OnboardingModal = ({ isOpen, onClose }) => {
               placeholder="Enter your full name"
               required
               className="w-full"
+              disabled={loading}
             />
           </div>
 
@@ -123,6 +160,7 @@ const OnboardingModal = ({ isOpen, onClose }) => {
               placeholder="your.email@university.edu"
               required
               className="w-full"
+              disabled={loading}
             />
           </div>
 
@@ -143,11 +181,13 @@ const OnboardingModal = ({ isOpen, onClose }) => {
                 placeholder="Create a password"
                 required
                 className="w-full pr-10"
+                disabled={loading}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                disabled={loading}
               >
                 {showPassword ? (
                   <EyeOff className="w-5 h-5" />
@@ -175,11 +215,13 @@ const OnboardingModal = ({ isOpen, onClose }) => {
                 placeholder="Confirm your password"
                 required
                 className="w-full pr-10"
+                disabled={loading}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                disabled={loading}
               >
                 {showConfirmPassword ? (
                   <EyeOff className="w-5 h-5" />
