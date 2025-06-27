@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, User, Menu, X, Bell, Plus } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Search, ShoppingCart, User, Menu, X, Bell, Plus } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 const Header = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSeller, setIsSeller] = useState(false);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -20,7 +21,7 @@ const Header = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
     setIsMenuOpen(false);
   };
 
@@ -35,9 +36,39 @@ const Header = () => {
             </div>
             <div className="flex flex-col">
               <span className="text-2xl font-bold text-gray-900">UniCart</span>
-              <span className="text-xs text-gray-500 -mt-1">Campus Marketplace</span>
+              <span className="text-xs text-gray-500 -mt-1">
+                Campus Marketplace
+              </span>
             </div>
           </Link>
+
+          {/* Seller/Buyer Toggle */}
+          <div className="flex items-center mr-4">
+            <span
+              className={`mr-2 text-sm font-medium ${
+                isSeller ? "text-gray-400" : "text-blue-600"
+              }`}
+            >
+              Buyer
+            </span>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isSeller}
+                onChange={() => setIsSeller((v) => !v)}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer peer-checked:bg-blue-600 transition-all"></div>
+              <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-md transition-transform peer-checked:translate-x-5"></div>
+            </label>
+            <span
+              className={`ml-2 text-sm font-medium ${
+                isSeller ? "text-blue-600" : "text-gray-400"
+              }`}
+            >
+              Seller
+            </span>
+          </div>
 
           {/* Enhanced Search Bar - Desktop */}
           <div className="hidden md:flex flex-1 max-w-2xl mx-8">
@@ -64,13 +95,22 @@ const Header = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
             <nav className="flex items-center space-x-6">
-              <Link to="/" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+              <Link
+                to="/"
+                className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+              >
                 Home
               </Link>
-              <Link to="/categories" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+              <Link
+                to="/categories"
+                className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+              >
                 Categories
               </Link>
-              <Link to="/about" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+              <Link
+                to="/about"
+                className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+              >
                 About
               </Link>
             </nav>
@@ -83,7 +123,7 @@ const Header = () => {
                     Sell Item
                   </Button>
                 </Link>
-                
+
                 <Button variant="ghost" size="sm" className="relative">
                   <Bell className="w-5 h-5 text-gray-600" />
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
@@ -95,28 +135,45 @@ const Header = () => {
                   <button className="flex items-center space-x-3 text-gray-700 hover:text-blue-600 transition-colors">
                     <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
                       {user.avatar ? (
-                        <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-full" />
+                        <img
+                          src={user.avatar}
+                          alt={user.name}
+                          className="w-10 h-10 rounded-full"
+                        />
                       ) : (
                         <User className="w-5 h-5 text-white" />
                       )}
                     </div>
                     <div className="flex flex-col text-left">
-                      <span className="font-medium text-sm">{user.name.split(' ')[0]}</span>
-                      <span className="text-xs text-gray-500">{user.university}</span>
+                      <span className="font-medium text-sm">
+                        {user.name.split(" ")[0]}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {user.university}
+                      </span>
                     </div>
                   </button>
-                  
+
                   {/* Enhanced Dropdown Menu */}
                   <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 border border-gray-200">
-                    <Link to="/profile" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                    <Link
+                      to="/profile"
+                      className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                    >
                       <User className="w-4 h-4 mr-3" />
                       My Profile
                     </Link>
-                    <Link to="/my-items" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                    <Link
+                      to="/my-items"
+                      className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                    >
                       <ShoppingCart className="w-4 h-4 mr-3" />
                       My Items
                     </Link>
-                    <Link to="/orders" className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors">
+                    <Link
+                      to="/orders"
+                      className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                    >
                       <Bell className="w-4 h-4 mr-3" />
                       My Orders
                     </Link>
@@ -134,7 +191,9 @@ const Header = () => {
             ) : (
               <div className="flex items-center space-x-4">
                 <Link to="/login">
-                  <Button variant="ghost" className="font-medium">Sign In</Button>
+                  <Button variant="ghost" className="font-medium">
+                    Sign In
+                  </Button>
                 </Link>
                 <Link to="/register">
                   <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium">
@@ -150,7 +209,11 @@ const Header = () => {
             className="md:hidden p-2 text-gray-600 hover:text-blue-600 transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
           </button>
         </div>
 
@@ -180,30 +243,51 @@ const Header = () => {
       {isMenuOpen && (
         <div className="md:hidden bg-white border-t border-gray-200 shadow-lg">
           <div className="px-4 py-3 space-y-2">
-            <Link to="/" className="block px-3 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium">
+            <Link
+              to="/"
+              className="block px-3 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
+            >
               Home
             </Link>
-            <Link to="/categories" className="block px-3 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium">
+            <Link
+              to="/categories"
+              className="block px-3 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
+            >
               Categories
             </Link>
-            <Link to="/about" className="block px-3 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium">
+            <Link
+              to="/about"
+              className="block px-3 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
+            >
               About
             </Link>
-            
+
             {user ? (
               <>
                 <hr className="my-2 border-gray-200" />
-                <Link to="/sell" className="block px-3 py-3 text-green-600 hover:bg-green-50 rounded-lg transition-colors font-medium">
+                <Link
+                  to="/sell"
+                  className="block px-3 py-3 text-green-600 hover:bg-green-50 rounded-lg transition-colors font-medium"
+                >
                   <Plus className="w-4 h-4 inline mr-2" />
                   Sell Item
                 </Link>
-                <Link to="/profile" className="block px-3 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
+                <Link
+                  to="/profile"
+                  className="block px-3 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
+                >
                   My Profile
                 </Link>
-                <Link to="/my-items" className="block px-3 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
+                <Link
+                  to="/my-items"
+                  className="block px-3 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
+                >
                   My Items
                 </Link>
-                <Link to="/orders" className="block px-3 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors">
+                <Link
+                  to="/orders"
+                  className="block px-3 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors"
+                >
                   My Orders
                 </Link>
                 <button
@@ -216,10 +300,16 @@ const Header = () => {
             ) : (
               <>
                 <hr className="my-2 border-gray-200" />
-                <Link to="/login" className="block px-3 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium">
+                <Link
+                  to="/login"
+                  className="block px-3 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-colors font-medium"
+                >
                   Sign In
                 </Link>
-                <Link to="/register" className="block px-3 py-3 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium">
+                <Link
+                  to="/register"
+                  className="block px-3 py-3 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium"
+                >
                   Sign Up
                 </Link>
               </>

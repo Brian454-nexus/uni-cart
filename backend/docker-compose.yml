@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  backend:
+    build: .
+    container_name: unicart-backend
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+
+  db:
+    image: postgres:15
+    container_name: unicart-db
+    restart: always
+    environment:
+      POSTGRES_USER: unicart
+      POSTGRES_PASSWORD: unicart
+      POSTGRES_DB: unicart
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    container_name: unicart-redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+volumes:
+  pgdata:

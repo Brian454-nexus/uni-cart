@@ -1,22 +1,68 @@
-import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { mockProducts } from '../data/mockData';
-import PaymentModal from '../components/PaymentModal';
-import { Button } from '@/components/ui/button';
-import { MapPin, Star, MessageCircle, Share2, Heart, ArrowLeft, User, Shield, Clock } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
+import { mockProducts } from "../data/mockData";
+import PaymentModal from "../components/PaymentModal";
+import ChatModal from "../components/ChatModal";
+import { Button } from "@/components/ui/button";
+import {
+  MapPin,
+  Star,
+  MessageCircle,
+  Share2,
+  Heart,
+  ArrowLeft,
+  User,
+  Shield,
+  Clock,
+} from "lucide-react";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const [selectedImage, setSelectedImage] = useState(0);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  
-  const product = mockProducts.find(p => p.id === id);
+  const [liked, setLiked] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+
+  const product = mockProducts.find((p) => p.id === id);
+
+  useEffect(() => {
+    // Check if liked in localStorage
+    const likedProducts = JSON.parse(
+      localStorage.getItem("likedProducts") || "[]"
+    );
+    setLiked(likedProducts.includes(product.id));
+  }, [product.id]);
+
+  const handleLike = () => {
+    let likedProducts = JSON.parse(
+      localStorage.getItem("likedProducts") || "[]"
+    );
+    if (!liked) {
+      likedProducts.push(product.id);
+    } else {
+      likedProducts = likedProducts.filter((id) => id !== product.id);
+    }
+    localStorage.setItem("likedProducts", JSON.stringify(likedProducts));
+    setLiked((prev) => !prev);
+  };
+
+  const handleShare = () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      navigator.share({ title: product.title, url });
+    } else {
+      navigator.clipboard.writeText(url);
+      alert("Product link copied to clipboard!");
+    }
+  };
 
   if (!product) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Product Not Found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Product Not Found
+          </h1>
           <Link to="/">
             <Button>Return to Home</Button>
           </Link>
@@ -26,25 +72,25 @@ const ProductDetail = () => {
   }
 
   const formatPrice = (price) => {
-    return new Intl.NumberFormat('en-KE', {
-      style: 'currency',
-      currency: 'KES',
+    return new Intl.NumberFormat("en-KE", {
+      style: "currency",
+      currency: "KES",
       minimumFractionDigits: 0,
     }).format(price);
   };
 
   const getConditionColor = (condition) => {
     const colors = {
-      'new': 'text-green-600 bg-green-100',
-      'like-new': 'text-blue-600 bg-blue-100',
-      'good': 'text-yellow-600 bg-yellow-100',
-      'fair': 'text-orange-600 bg-orange-100'
+      new: "text-green-600 bg-green-100",
+      "like-new": "text-blue-600 bg-blue-100",
+      good: "text-yellow-600 bg-yellow-100",
+      fair: "text-orange-600 bg-orange-100",
     };
-    return colors[condition] || 'text-gray-600 bg-gray-100';
+    return colors[condition] || "text-gray-600 bg-gray-100";
   };
 
   const similarProducts = mockProducts
-    .filter(p => p.category === product.category && p.id !== product.id)
+    .filter((p) => p.category === product.category && p.id !== product.id)
     .slice(0, 3);
 
   return (
@@ -52,13 +98,18 @@ const ProductDetail = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
-          <Link to="/" className="hover:text-blue-600">Home</Link>
+          <Link to="/" className="hover:text-blue-600">
+            Home
+          </Link>
           <span>/</span>
           <span className="text-gray-900">{product.title}</span>
         </div>
 
         {/* Back Button */}
-        <Link to="/" className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-6">
+        <Link
+          to="/"
+          className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-6"
+        >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Products
         </Link>
@@ -73,7 +124,7 @@ const ProductDetail = () => {
                 className="w-full h-full object-cover"
               />
             </div>
-            
+
             {product.images.length > 1 && (
               <div className="flex space-x-2 overflow-x-auto pb-2">
                 {product.images.map((image, index) => (
@@ -81,7 +132,7 @@ const ProductDetail = () => {
                     key={index}
                     onClick={() => setSelectedImage(index)}
                     className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden ${
-                      selectedImage === index ? 'ring-2 ring-blue-600' : ''
+                      selectedImage === index ? "ring-2 ring-blue-600" : ""
                     }`}
                   >
                     <img
@@ -98,13 +149,20 @@ const ProductDetail = () => {
           {/* Product Info */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.title}</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                {product.title}
+              </h1>
               <div className="flex items-center space-x-4 mb-4">
                 <span className="text-3xl font-bold text-blue-600">
                   {formatPrice(product.price)}
                 </span>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getConditionColor(product.condition)}`}>
-                  {product.condition.charAt(0).toUpperCase() + product.condition.slice(1).replace('-', ' ')}
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${getConditionColor(
+                    product.condition
+                  )}`}
+                >
+                  {product.condition.charAt(0).toUpperCase() +
+                    product.condition.slice(1).replace("-", " ")}
                 </span>
               </div>
             </div>
@@ -117,21 +175,33 @@ const ProductDetail = () => {
 
             {/* Actions */}
             <div className="flex flex-col sm:flex-row gap-3">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="flex-1"
                 onClick={() => setIsPaymentModalOpen(true)}
               >
                 Buy Now - {formatPrice(product.price)}
               </Button>
-              <Button variant="outline" size="lg">
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => setShowChat(true)}
+              >
                 <MessageCircle className="w-5 h-5 mr-2" />
                 Contact Seller
               </Button>
-              <Button variant="outline" size="lg">
-                <Heart className="w-5 h-5" />
+              <Button
+                variant={liked ? "secondary" : "outline"}
+                size="lg"
+                onClick={handleLike}
+              >
+                <Heart
+                  className={`w-5 h-5 ${
+                    liked ? "text-blue-600 fill-blue-600" : ""
+                  }`}
+                />
               </Button>
-              <Button variant="outline" size="lg">
+              <Button variant="outline" size="lg" onClick={handleShare}>
                 <Share2 className="w-5 h-5" />
               </Button>
             </div>
@@ -142,20 +212,32 @@ const ProductDetail = () => {
               <div className="flex items-center space-x-4">
                 <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
                   {product.seller.avatar ? (
-                    <img src={product.seller.avatar} alt={product.seller.name} className="w-12 h-12 rounded-full" />
+                    <img
+                      src={product.seller.avatar}
+                      alt={product.seller.name}
+                      className="w-12 h-12 rounded-full"
+                    />
                   ) : (
                     <User className="w-6 h-6 text-gray-600" />
                   )}
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-medium text-gray-900">{product.seller.name}</h4>
-                  <p className="text-sm text-gray-600">{product.seller.university}</p>
+                  <h4 className="font-medium text-gray-900">
+                    {product.seller.name}
+                  </h4>
+                  <p className="text-sm text-gray-600">
+                    {product.seller.university}
+                  </p>
                   <div className="flex items-center space-x-4 mt-1">
                     <div className="flex items-center">
                       <Star className="w-4 h-4 text-yellow-400 fill-current mr-1" />
-                      <span className="text-sm text-gray-600">{product.seller.rating}</span>
+                      <span className="text-sm text-gray-600">
+                        {product.seller.rating}
+                      </span>
                     </div>
-                    <span className="text-sm text-gray-600">{product.seller.totalSales} sales</span>
+                    <span className="text-sm text-gray-600">
+                      {product.seller.totalSales} sales
+                    </span>
                   </div>
                 </div>
               </div>
@@ -166,7 +248,9 @@ const ProductDetail = () => {
               <div className="flex items-start space-x-3">
                 <Shield className="w-5 h-5 text-blue-600 mt-0.5" />
                 <div>
-                  <h4 className="font-medium text-blue-900 mb-1">Safety Tips</h4>
+                  <h4 className="font-medium text-blue-900 mb-1">
+                    Safety Tips
+                  </h4>
                   <ul className="text-sm text-blue-800 space-y-1">
                     <li>• Meet in a public place on campus</li>
                     <li>• Inspect the item before payment</li>
@@ -180,7 +264,9 @@ const ProductDetail = () => {
 
         {/* Product Description */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Description</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            Description
+          </h2>
           <div className="prose max-w-none text-gray-700">
             <p>{product.description}</p>
           </div>
@@ -189,7 +275,9 @@ const ProductDetail = () => {
         {/* Similar Products */}
         {similarProducts.length > 0 && (
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Similar Products</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">
+              Similar Products
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {similarProducts.map((similarProduct) => (
                 <Link
@@ -225,6 +313,18 @@ const ProductDetail = () => {
         onClose={() => setIsPaymentModalOpen(false)}
         product={product}
       />
+
+      {/* Chat Modal (Real-Time) */}
+      {showChat && (
+        <ChatModal
+          isOpen={showChat}
+          onClose={() => setShowChat(false)}
+          productId={product.id}
+          senderId={localStorage.getItem("userId") || "buyer-demo"}
+          receiverId={product.seller.id}
+          senderName={localStorage.getItem("userName") || "You"}
+        />
+      )}
     </div>
   );
 };
