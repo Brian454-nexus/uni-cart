@@ -1,6 +1,15 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, User, Menu, X, Bell, Plus, Store, ShoppingBag } from "lucide-react";
+import {
+  ShoppingCart,
+  User,
+  Menu,
+  X,
+  Bell,
+  Plus,
+  Store,
+  ShoppingBag,
+} from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,7 +35,7 @@ const Header = () => {
 
   const getDashboardLink = () => {
     if (!user) return "/";
-    return user.role === 'seller' ? '/seller/dashboard' : '/dashboard';
+    return user.role === "seller" ? "/seller/dashboard" : "/dashboard";
   };
 
   return (
@@ -55,10 +64,10 @@ const Header = () => {
               >
                 Home
               </Link>
-              
+
               {user && (
                 <>
-                  {user.role === 'buyer' ? (
+                  {user.role === "buyer" ? (
                     <>
                       <Link
                         to="/dashboard"
@@ -101,7 +110,7 @@ const Header = () => {
 
             {user ? (
               <div className="flex items-center space-x-4">
-                {user.role === 'seller' && (
+                {user.role === "seller" && (
                   <Link to="/seller/add">
                     <Button className="bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-medium">
                       <Plus className="w-4 h-4 mr-2" />
@@ -135,7 +144,7 @@ const Header = () => {
                         {user.name.split(" ")[0]}
                       </span>
                       <span className="text-xs text-gray-500 flex items-center">
-                        {user.role === 'seller' ? (
+                        {user.role === "seller" ? (
                           <>
                             <Store className="w-3 h-3 mr-1" />
                             Seller
@@ -159,8 +168,8 @@ const Header = () => {
                       <User className="w-4 h-4 mr-3" />
                       Dashboard
                     </Link>
-                    
-                    {user.role === 'seller' ? (
+
+                    {user.role === "seller" ? (
                       <>
                         <Link
                           to="/seller/products"
@@ -178,17 +187,15 @@ const Header = () => {
                         </Link>
                       </>
                     ) : (
-                      <>
-                        <Link
-                          to="/liked-products"
-                          className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                        >
-                          <ShoppingCart className="w-4 h-4 mr-3" />
-                          Favourites
-                        </Link>
-                      </>
+                      <Link
+                        to="/liked-products"
+                        className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                      >
+                        <ShoppingCart className="w-4 h-4 mr-3" />
+                        Favourites
+                      </Link>
                     )}
-                    
+
                     <hr className="my-1 border-gray-200" />
                     <button
                       onClick={handleLogout}
@@ -240,10 +247,10 @@ const Header = () => {
               >
                 Home
               </Link>
-              
-              {user && (
+
+              {user ? (
                 <>
-                  {user.role === 'buyer' ? (
+                  {user.role === "buyer" ? (
                     <>
                       <Link
                         to="/dashboard"
@@ -292,7 +299,7 @@ const Header = () => {
                       </Link>
                     </>
                   )}
-                  
+
                   <hr className="my-2 border-gray-200" />
                   <button
                     onClick={handleLogout}
