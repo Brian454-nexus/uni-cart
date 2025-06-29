@@ -29,7 +29,8 @@ def create_app(config_class=Config):
     ma.init_app(app)
     jwt.init_app(app)
     migrate.init_app(app, db)
-    CORS(app)
+    # Enable CORS for frontend at http://localhost:3000
+    CORS(app, resources={r"/api/*": {"origins": ["http://localhost:3000"]}}, supports_credentials=True)
     Swagger(app)
     socketio.init_app(app)
 

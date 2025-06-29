@@ -27,13 +27,18 @@ def root_health():
     return jsonify({'status': 'ok', 'app': 'unicart-backend'}), 200
 
 # AUTH ENDPOINTS
-@auth_bp.route('/auth/register', methods=['POST'])
+@auth_bp.route('/api/auth/register', methods=['POST'])
 def register():
-    data = request.get_json()
-    result = register_user(data)
-    if result['success']:
-        return jsonify(result), 201
-    return jsonify(result), 400
+    try:
+        data = request.get_json()
+        result = register_user(data)
+        if result['success']:
+            return jsonify(result), 201
+        return jsonify(result), 400
+    except Exception as e:
+        import traceback
+        print(traceback.format_exc())
+        return jsonify({'success': False, 'message': 'Internal server error', 'error': str(e)}), 500
 
 @auth_bp.route('/auth/login', methods=['POST'])
 def login():

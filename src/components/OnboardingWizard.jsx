@@ -1,48 +1,54 @@
-import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { 
-  User, 
-  Store, 
-  ShoppingBag, 
-  Phone, 
-  MapPin, 
-  Upload, 
-  ChevronLeft, 
+import React, { useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+  User,
+  Store,
+  ShoppingBag,
+  Phone,
+  MapPin,
+  Upload,
+  ChevronLeft,
   ChevronRight,
-  CheckCircle
-} from 'lucide-react';
+  CheckCircle,
+} from "lucide-react";
 
 const OnboardingWizard = ({ isOpen, onClose }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    role: '',
+    role: "",
     profilePhoto: null,
-    phone: '',
-    location: '',
-    university: '',
+    phone: "",
+    location: "",
+    university: "",
     // Buyer specific
     preferences: {
       categories: [],
-      priceRange: '',
-      brands: []
+      priceRange: "",
+      brands: [],
     },
     // Seller specific
-    storeName: '',
-    businessCategory: '',
-    mpesaNumber: '',
-    paystackEmail: '',
-    inventoryCapacity: ''
+    storeName: "",
+    businessCategory: "",
+    mpesaNumber: "",
+    paystackEmail: "",
+    inventoryCapacity: "",
   });
 
   const { completeOnboarding } = useAuth();
@@ -51,19 +57,19 @@ const OnboardingWizard = ({ isOpen, onClose }) => {
   const totalSteps = 3;
 
   const handleInputChange = (field, value) => {
-    if (field.includes('.')) {
-      const [parent, child] = field.split('.');
-      setFormData(prev => ({
+    if (field.includes(".")) {
+      const [parent, child] = field.split(".");
+      setFormData((prev) => ({
         ...prev,
         [parent]: {
           ...prev[parent],
-          [child]: value
-        }
+          [child]: value,
+        },
       }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [field]: value
+        [field]: value,
       }));
     }
   };
@@ -71,9 +77,9 @@ const OnboardingWizard = ({ isOpen, onClose }) => {
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        profilePhoto: file
+        profilePhoto: file,
       }));
     }
   };
@@ -93,18 +99,27 @@ const OnboardingWizard = ({ isOpen, onClose }) => {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      await completeOnboarding(formData);
-      
-      // Redirect based on role
-      if (formData.role === 'seller') {
-        navigate('/seller/dashboard');
-      } else {
-        navigate('/dashboard');
+      // Simulate upload and get photo URL if profilePhoto exists
+      let avatarUrl = null;
+      if (formData.profilePhoto) {
+        // In a real app, upload to backend and get URL
+        // For demo, use a local object URL
+        avatarUrl = URL.createObjectURL(formData.profilePhoto);
       }
-      
+      await completeOnboarding(formData);
+      // Save avatar to user_data in localStorage
+      const userData = JSON.parse(localStorage.getItem("user_data") || "{}");
+      if (avatarUrl) userData.avatar = avatarUrl;
+      localStorage.setItem("user_data", JSON.stringify(userData));
+      // Redirect based on role
+      if (formData.role === "seller") {
+        navigate("/seller/dashboard");
+      } else {
+        navigate("/");
+      }
       onClose();
     } catch (error) {
-      console.error('Onboarding failed:', error);
+      console.error("Onboarding failed:", error);
     } finally {
       setLoading(false);
     }
@@ -113,14 +128,21 @@ const OnboardingWizard = ({ isOpen, onClose }) => {
   const canProceed = () => {
     switch (currentStep) {
       case 1:
-        return formData.role !== '';
+        return formData.role !== "";
       case 2:
         return formData.phone && formData.location;
       case 3:
-        if (formData.role === 'buyer') {
-          return formData.preferences.categories.length > 0 && formData.preferences.priceRange;
+        if (formData.role === "buyer") {
+          return (
+            formData.preferences.categories.length > 0 &&
+            formData.preferences.priceRange
+          );
         } else {
-          return formData.storeName && formData.businessCategory && formData.mpesaNumber;
+          return (
+            formData.storeName &&
+            formData.businessCategory &&
+            formData.mpesaNumber
+          );
         }
       default:
         return false;
@@ -130,37 +152,49 @@ const OnboardingWizard = ({ isOpen, onClose }) => {
   const renderStep1 = () => (
     <div className="space-y-6">
       <div className="text-center">
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">Choose Your Role</h3>
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          Choose Your Role
+        </h3>
         <p className="text-gray-600">How do you plan to use UniCart?</p>
       </div>
 
       <RadioGroup
         value={formData.role}
-        onValueChange={(value) => handleInputChange('role', value)}
+        onValueChange={(value) => handleInputChange("role", value)}
         className="space-y-4"
       >
         <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
           <RadioGroupItem value="buyer" id="buyer" />
-          <Label htmlFor="buyer" className="flex items-center space-x-3 cursor-pointer flex-1">
+          <Label
+            htmlFor="buyer"
+            className="flex items-center space-x-3 cursor-pointer flex-1"
+          >
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
               <ShoppingBag className="w-6 h-6 text-blue-600" />
             </div>
             <div className="flex-1">
               <div className="font-medium text-gray-900">Buyer</div>
-              <div className="text-sm text-gray-500">I want to buy items from other students</div>
+              <div className="text-sm text-gray-500">
+                I want to buy items from other students
+              </div>
             </div>
           </Label>
         </div>
 
         <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
           <RadioGroupItem value="seller" id="seller" />
-          <Label htmlFor="seller" className="flex items-center space-x-3 cursor-pointer flex-1">
+          <Label
+            htmlFor="seller"
+            className="flex items-center space-x-3 cursor-pointer flex-1"
+          >
             <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
               <Store className="w-6 h-6 text-orange-600" />
             </div>
             <div className="flex-1">
               <div className="font-medium text-gray-900">Seller</div>
-              <div className="text-sm text-gray-500">I want to sell items to other students</div>
+              <div className="text-sm text-gray-500">
+                I want to sell items to other students
+              </div>
             </div>
           </Label>
         </div>
@@ -171,7 +205,9 @@ const OnboardingWizard = ({ isOpen, onClose }) => {
   const renderStep2 = () => (
     <div className="space-y-6">
       <div className="text-center">
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">Complete Your Profile</h3>
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          Complete Your Profile
+        </h3>
         <p className="text-gray-600">Tell us a bit about yourself</p>
       </div>
 
@@ -218,7 +254,7 @@ const OnboardingWizard = ({ isOpen, onClose }) => {
           <Input
             type="tel"
             value={formData.phone}
-            onChange={(e) => handleInputChange('phone', e.target.value)}
+            onChange={(e) => handleInputChange("phone", e.target.value)}
             placeholder="+254 712 345 678"
             className="w-full"
           />
@@ -231,7 +267,7 @@ const OnboardingWizard = ({ isOpen, onClose }) => {
           <Input
             type="text"
             value={formData.location}
-            onChange={(e) => handleInputChange('location', e.target.value)}
+            onChange={(e) => handleInputChange("location", e.target.value)}
             placeholder="Nairobi, Kenya"
             className="w-full"
           />
@@ -244,7 +280,7 @@ const OnboardingWizard = ({ isOpen, onClose }) => {
           <Input
             type="text"
             value={formData.university}
-            onChange={(e) => handleInputChange('university', e.target.value)}
+            onChange={(e) => handleInputChange("university", e.target.value)}
             placeholder="University of Nairobi"
             className="w-full"
           />
@@ -254,11 +290,13 @@ const OnboardingWizard = ({ isOpen, onClose }) => {
   );
 
   const renderStep3 = () => {
-    if (formData.role === 'buyer') {
+    if (formData.role === "buyer") {
       return (
         <div className="space-y-6">
           <div className="text-center">
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Shopping Preferences</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Shopping Preferences
+            </h3>
             <p className="text-gray-600">Help us show you relevant items</p>
           </div>
 
@@ -268,16 +306,27 @@ const OnboardingWizard = ({ isOpen, onClose }) => {
                 Preferred Categories
               </label>
               <div className="grid grid-cols-2 gap-2">
-                {['Electronics', 'Books', 'Clothing', 'Sports', 'Furniture', 'Beauty'].map((category) => (
+                {[
+                  "Electronics",
+                  "Books",
+                  "Clothing",
+                  "Sports",
+                  "Furniture",
+                  "Beauty",
+                ].map((category) => (
                   <label key={category} className="flex items-center space-x-2">
                     <input
                       type="checkbox"
-                      checked={formData.preferences.categories.includes(category)}
+                      checked={formData.preferences.categories.includes(
+                        category
+                      )}
                       onChange={(e) => {
                         const categories = e.target.checked
                           ? [...formData.preferences.categories, category]
-                          : formData.preferences.categories.filter(c => c !== category);
-                        handleInputChange('preferences.categories', categories);
+                          : formData.preferences.categories.filter(
+                              (c) => c !== category
+                            );
+                        handleInputChange("preferences.categories", categories);
                       }}
                       className="rounded"
                     />
@@ -293,7 +342,9 @@ const OnboardingWizard = ({ isOpen, onClose }) => {
               </label>
               <Select
                 value={formData.preferences.priceRange}
-                onValueChange={(value) => handleInputChange('preferences.priceRange', value)}
+                onValueChange={(value) =>
+                  handleInputChange("preferences.priceRange", value)
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select price range" />
@@ -313,7 +364,9 @@ const OnboardingWizard = ({ isOpen, onClose }) => {
       return (
         <div className="space-y-6">
           <div className="text-center">
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Business Information</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Business Information
+            </h3>
             <p className="text-gray-600">Set up your seller profile</p>
           </div>
 
@@ -325,7 +378,7 @@ const OnboardingWizard = ({ isOpen, onClose }) => {
               <Input
                 type="text"
                 value={formData.storeName}
-                onChange={(e) => handleInputChange('storeName', e.target.value)}
+                onChange={(e) => handleInputChange("storeName", e.target.value)}
                 placeholder="Your store name"
                 className="w-full"
               />
@@ -337,7 +390,9 @@ const OnboardingWizard = ({ isOpen, onClose }) => {
               </label>
               <Select
                 value={formData.businessCategory}
-                onValueChange={(value) => handleInputChange('businessCategory', value)}
+                onValueChange={(value) =>
+                  handleInputChange("businessCategory", value)
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
@@ -361,7 +416,9 @@ const OnboardingWizard = ({ isOpen, onClose }) => {
               <Input
                 type="tel"
                 value={formData.mpesaNumber}
-                onChange={(e) => handleInputChange('mpesaNumber', e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("mpesaNumber", e.target.value)
+                }
                 placeholder="254712345678"
                 className="w-full"
               />
@@ -374,7 +431,9 @@ const OnboardingWizard = ({ isOpen, onClose }) => {
               <Input
                 type="email"
                 value={formData.paystackEmail}
-                onChange={(e) => handleInputChange('paystackEmail', e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("paystackEmail", e.target.value)
+                }
                 placeholder="your.email@example.com"
                 className="w-full"
               />
@@ -386,7 +445,9 @@ const OnboardingWizard = ({ isOpen, onClose }) => {
               </label>
               <Select
                 value={formData.inventoryCapacity}
-                onValueChange={(value) => handleInputChange('inventoryCapacity', value)}
+                onValueChange={(value) =>
+                  handleInputChange("inventoryCapacity", value)
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select capacity" />
@@ -425,10 +486,17 @@ const OnboardingWizard = ({ isOpen, onClose }) => {
           {/* Progress Bar */}
           <div className="space-y-2">
             <div className="flex justify-between text-sm text-gray-600">
-              <span>Step {currentStep} of {totalSteps}</span>
-              <span>{Math.round((currentStep / totalSteps) * 100)}% Complete</span>
+              <span>
+                Step {currentStep} of {totalSteps}
+              </span>
+              <span>
+                {Math.round((currentStep / totalSteps) * 100)}% Complete
+              </span>
             </div>
-            <Progress value={(currentStep / totalSteps) * 100} className="w-full" />
+            <Progress
+              value={(currentStep / totalSteps) * 100}
+              className="w-full"
+            />
           </div>
 
           {/* Step Content */}
@@ -461,7 +529,7 @@ const OnboardingWizard = ({ isOpen, onClose }) => {
                 disabled={!canProceed() || loading}
                 className="flex items-center space-x-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
               >
-                {loading ? 'Completing...' : 'Complete Setup'}
+                {loading ? "Completing..." : "Complete Setup"}
                 <CheckCircle className="w-4 h-4" />
               </Button>
             )}
@@ -472,4 +540,4 @@ const OnboardingWizard = ({ isOpen, onClose }) => {
   );
 };
 
-export default OnboardingWizard; 
+export default OnboardingWizard;

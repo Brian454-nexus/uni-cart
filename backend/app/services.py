@@ -32,9 +32,11 @@ def register_user(data):
         db.session.add(user)
         db.session.commit()
     except Exception as e:
+        import traceback
+        print(traceback.format_exc())
         db.session.rollback()
-        # Only return error if it's a unique constraint violation (email already checked above)
-        return {'success': False, 'message': 'Signup failed due to a server error. Please try again.'}
+        # Always return a valid JSON object, never None or empty
+        return {'success': False, 'message': 'Signup failed due to a server error. Please try again.', 'error': str(e)}
     from flask_jwt_extended import create_access_token
     token = create_access_token(identity=user.id)
     user_obj = {
@@ -49,6 +51,7 @@ def register_user(data):
         'totalSales': 0,
         'createdAt': user.created_at.isoformat() if hasattr(user, 'created_at') and user.created_at else None
     }
+    # Always return a valid JSON object
     return {'success': True, 'token': token, 'user': user_obj}
 
 def login_user(data):

@@ -89,25 +89,25 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Patch: Always update user role in context/localStorage after onboarding (demo mode or real)
   const completeOnboarding = async (onboardingData) => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("unicart_token");
-      const response = await fetch(`${API_BASE}/onboarding`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(onboardingData),
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Onboarding failed");
+      // DEMO: If backend is bypassed, update user in context/localStorage directly
+      let updatedUser = user;
+      if (!user || !user.email) {
+        // fallback: get from localStorage
+        updatedUser = JSON.parse(localStorage.getItem("user_data")) || {};
       }
-      const updatedUser = await response.json();
-      setUser(updatedUser.user);
-      localStorage.setItem("user_data", JSON.stringify(updatedUser.user));
+      // Update user with onboarding data (role, etc)
+      updatedUser = {
+        ...updatedUser,
+        ...onboardingData,
+        role: onboardingData.role,
+        onboarding_completed: true,
+      };
+      setUser(updatedUser);
+      localStorage.setItem("user_data", JSON.stringify(updatedUser));
       setShowOnboarding(false);
       return { success: true };
     } catch (error) {

@@ -69,12 +69,6 @@ const Header = () => {
                   {user.role === "buyer" ? (
                     <>
                       <Link
-                        to="/dashboard"
-                        className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
-                      >
-                        Browse
-                      </Link>
-                      <Link
                         to="/liked-products"
                         className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
                       >
@@ -144,10 +138,10 @@ const Header = () => {
                         <img
                           src={user.avatar}
                           alt={user.name}
-                          className="w-10 h-10 rounded-full"
+                          className="w-8 h-8 rounded-full object-cover"
                         />
                       ) : (
-                        <User className="w-5 h-5 text-white" />
+                        <User className="w-6 h-6 text-gray-600" />
                       )}
                     </div>
                     <div className="flex flex-col text-left">
@@ -218,20 +212,7 @@ const Header = () => {
                   </div>
                 </div>
               </div>
-            ) : (
-              <div className="flex items-center space-x-4">
-                {/* Search bar for non-authenticated users */}
-                <form onSubmit={handleSearch} className="relative">
-                  <Input
-                    type="text"
-                    placeholder="Search products..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-64"
-                  />
-                </form>
-              </div>
-            )}
+            ) : null}
           </div>
 
           {/* Mobile Menu Button */}
@@ -262,13 +243,6 @@ const Header = () => {
                 <>
                   {user.role === "buyer" ? (
                     <>
-                      <Link
-                        to="/dashboard"
-                        className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        Browse
-                      </Link>
                       <Link
                         to="/liked-products"
                         className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
@@ -325,19 +299,7 @@ const Header = () => {
                     Sign Out
                   </button>
                 </>
-              ) : (
-                <div className="px-3 py-2">
-                  <form onSubmit={handleSearch} className="relative">
-                    <Input
-                      type="text"
-                      placeholder="Search products..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full"
-                    />
-                  </form>
-                </div>
-              )}
+              ) : null}
             </div>
           </div>
         )}
