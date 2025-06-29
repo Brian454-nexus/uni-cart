@@ -1,23 +1,51 @@
 # Service layer for business logic
 
+from .models import User, Product, Category, Transaction, TokenBlocklist
+from .extensions import db
+from .utils import hash_password, verify_password, is_valid_image
+from werkzeug.utils import secure_filename
+import uuid
+import boto3
+from flask import current_app
+import datetime
+from .schemas import UserSchema, ProductSchema, CategorySchema, TransactionSchema
+from sqlalchemy import or_
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity
+
 # Auth services
 def register_user(data):
-    # Validate input
-    if not is_university_email(data.get('email', '')):
-        return {'success': False, 'msg': 'Invalid university email'}
+    # Accept name, email, password; university and phone optional
+    if not data.get('name') or not data.get('email') or not data.get('password'):
+        return {'success': False, 'message': 'Name, email, and password are required.'}
+    # Remove strict university email validation for now
     if User.query.filter_by(email=data['email']).first():
-        return {'success': False, 'msg': 'Email already registered'}
+        return {'success': False, 'message': 'Email already registered.'}
     user = User(
         name=data['name'],
         email=data['email'],
-        university=data['university'],
+        university=data.get('university', ''),
         phone=data.get('phone'),
         password_hash=hash_password(data['password'])
     )
     db.session.add(user)
     db.session.commit()
-    # TODO: Send verification email
-    return {'success': True, 'msg': 'Registered. Please verify your email.'}
+    # Generate JWT token for immediate login
+    from flask_jwt_extended import create_access_token
+    token = create_access_token(identity=user.id)
+    # Build user object for response
+    user_obj = {
+        'id': user.id,
+        'name': user.name,
+        'email': user.email,
+        'role': 'buyer',
+        'onboarding_completed': False,
+        'avatar': user.avatar_url,
+        'university': user.university,
+        'rating': 0,
+        'totalSales': 0,
+        'createdAt': user.created_at.isoformat() if user.created_at else None
+    }
+    return {'success': True, 'token': token, 'user': user_obj}
 
 def login_user(data):
     user = User.query.filter_by(email=data['email']).first()

@@ -45,4 +45,7 @@ def create_app(config_class=Config):
     app.register_blueprint(payments_bp)
     app.register_blueprint(root_bp)
 
+    # Import socketio handlers after app and socketio are ready
+    from . import socketio_handlers
+
     return app

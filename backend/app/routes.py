@@ -6,9 +6,7 @@ from .utils import validate_input, rate_limit
 from werkzeug.utils import secure_filename
 from .models import LikedProduct, Message, Product, Category
 from .schemas import LikedProductSchema, MessageSchema
-from . import socketio
 from .extensions import db
-from flask_socketio import emit, join_room
 from sqlalchemy import or_, and_
 import requests
 
@@ -227,32 +225,6 @@ def paystack_verify():
     return jsonify({'success': False, 'msg': 'Payment verification failed', 'data': resp.json()}), 400
 
 # SOCKETIO MESSAGING NAMESPACE
-@socketio.on('join', namespace='/api/messages')
-def on_join(data):
-    room = f"{data['product_id']}_{min(data['sender_id'], data['receiver_id'])}_{max(data['sender_id'], data['receiver_id'])}"
-    join_room(room)
-
-@socketio.on('send_message', namespace='/api/messages')
-def handle_message(data):
-    msg = Message(
-        sender_id=data['sender_id'],
-        receiver_id=data['receiver_id'],
-        product_id=data['product_id'],
-        message=data['message']
-    )
-    db.session.add(msg)
-    db.session.commit()
-    room = f"{data['product_id']}_{min(data['sender_id'], data['receiver_id'])}_{max(data['sender_id'], data['receiver_id'])}"
-    emit('receive_message', MessageSchema().dump(msg), room=room)
-
-@socketio.on('get_history', namespace='/api/messages')
-def get_history(data):
-    msgs = Message.query.filter_by(product_id=data['product_id']).filter(
-        or_(
-            and_(Message.sender_id==data['sender_id'], Message.receiver_id==data['receiver_id']),
-            and_(Message.sender_id==data['receiver_id'], Message.receiver_id==data['sender_id'])
-        )
-    ).order_by(Message.timestamp).all()
-    emit('history', MessageSchema(many=True).dump(msgs))
-
+# Remove all @socketio.on handlers from this file. Move them to a new file 'socketio_handlers.py'.
+# from . import socketio
 # More endpoints will be added to each blueprint in their respective modules
