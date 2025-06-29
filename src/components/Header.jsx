@@ -64,7 +64,6 @@ const Header = () => {
               >
                 Home
               </Link>
-
               {user && (
                 <>
                   {user.role === "buyer" ? (
@@ -80,6 +79,12 @@ const Header = () => {
                         className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
                       >
                         Favourites
+                      </Link>
+                      <Link
+                        to="/"
+                        className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+                      >
+                        Categories
                       </Link>
                     </>
                   ) : (
@@ -101,6 +106,12 @@ const Header = () => {
                         className="text-gray-700 hover:text-orange-600 font-medium transition-colors"
                       >
                         Messages
+                      </Link>
+                      <Link
+                        to="/seller/add"
+                        className="text-gray-700 hover:text-orange-600 font-medium transition-colors"
+                      >
+                        Add Product
                       </Link>
                     </>
                   )}
@@ -247,7 +258,6 @@ const Header = () => {
               >
                 Home
               </Link>
-
               {user ? (
                 <>
                   {user.role === "buyer" ? (
@@ -265,6 +275,13 @@ const Header = () => {
                         onClick={() => setIsMenuOpen(false)}
                       >
                         Favourites
+                      </Link>
+                      <Link
+                        to="/"
+                        className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Categories
                       </Link>
                     </>
                   ) : (

@@ -75,23 +75,7 @@ const Home = () => {
             <p className="text-xl md:text-2xl mb-8 text-blue-100">
               Buy and sell with fellow students at the best prices
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                size="lg"
-                variant="secondary"
-                className="bg-white text-blue-600 hover:bg-gray-100"
-              >
-                Start Shopping
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-white text-white hover:bg-white hover:text-blue-600"
-              >
-                Sell Your Items
-              </Button>
-            </div>
-            {/* Search Bar */}
+            {/* Only keep the main search bar here, remove buttons */}
             <div className="mt-8 max-w-xl mx-auto">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -113,16 +97,7 @@ const Home = () => {
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
-              <form className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Search for products..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </form>
+              {/* Removed additional search bar here */}
             </div>
 
             <div className="flex gap-3">

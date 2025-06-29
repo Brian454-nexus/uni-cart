@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, current_app, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from .schemas import UserSchema, ProductSchema, CategorySchema, TransactionSchema
 from .services import *
 from .utils import validate_input, rate_limit
@@ -127,7 +127,7 @@ def unlike_product(product_id):
 # PRODUCT ENDPOINTS
 @products_bp.route('/products', methods=['GET'])
 def list_products():
-   
+    result = get_products()
     return jsonify(result), 200
 
 @products_bp.route('/products', methods=['POST'])

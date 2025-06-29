@@ -45,27 +45,26 @@ const OnboardingModal = ({ isOpen, onClose }) => {
       setError("Please enter your full name");
       return;
     }
-
     if (!formData.email.trim()) {
       setError("Please enter your email address");
       return;
     }
-
     if (!formData.email.includes("@")) {
       setError("Please enter a valid email address");
       return;
     }
-
+    if (!formData.email.endsWith(".edu")) {
+      setError("Please use your university email address");
+      return;
+    }
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       return;
     }
-
     if (formData.password.length < 6) {
       setError("Password must be at least 6 characters long");
       return;
     }
-
     setLoading(true);
     try {
       await register({
@@ -73,9 +72,7 @@ const OnboardingModal = ({ isOpen, onClose }) => {
         email: formData.email.trim().toLowerCase(),
         password: formData.password,
       });
-
       // Modal will close automatically when onboarding starts
-      // No need to call onClose() here as the AuthContext will handle it
     } catch (err) {
       setError(err.message || "Registration failed. Please try again.");
     } finally {
