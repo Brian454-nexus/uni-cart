@@ -17,33 +17,37 @@ def register_user(data):
     # Accept name, email, password; university and phone optional
     if not data.get('name') or not data.get('email') or not data.get('password'):
         return {'success': False, 'message': 'Name, email, and password are required.'}
-    # Remove strict university email validation for now
+    # Allow any email (no .edu restriction)
     if User.query.filter_by(email=data['email']).first():
         return {'success': False, 'message': 'Email already registered.'}
-    user = User(
-        name=data['name'],
-        email=data['email'],
-        university=data.get('university', ''),
-        phone=data.get('phone'),
-        password_hash=hash_password(data['password'])
-    )
-    db.session.add(user)
-    db.session.commit()
-    # Generate JWT token for immediate login
+    try:
+        user = User(
+            name=data['name'],
+            email=data['email'],
+            university=data.get('university', ''),
+            phone=data.get('phone'),
+            password_hash=hash_password(data['password'])
+        )
+        user.verified = True  # Mark as verified for instant login
+        db.session.add(user)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        # Only return error if it's a unique constraint violation (email already checked above)
+        return {'success': False, 'message': 'Signup failed due to a server error. Please try again.'}
     from flask_jwt_extended import create_access_token
     token = create_access_token(identity=user.id)
-    # Build user object for response
     user_obj = {
         'id': user.id,
         'name': user.name,
         'email': user.email,
         'role': 'buyer',
         'onboarding_completed': False,
-        'avatar': user.avatar_url,
+        'avatar': getattr(user, 'avatar_url', None),
         'university': user.university,
         'rating': 0,
         'totalSales': 0,
-        'createdAt': user.created_at.isoformat() if user.created_at else None
+        'createdAt': user.created_at.isoformat() if hasattr(user, 'created_at') and user.created_at else None
     }
     return {'success': True, 'token': token, 'user': user_obj}
 

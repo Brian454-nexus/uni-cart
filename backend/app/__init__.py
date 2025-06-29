@@ -48,4 +48,26 @@ def create_app(config_class=Config):
     # Import socketio handlers after app and socketio are ready
     from . import socketio_handlers
 
+    # --- GLOBAL ERROR HANDLERS FOR JSON RESPONSES ---
+    @app.errorhandler(400)
+    def bad_request(e):
+        return {'success': False, 'message': 'Bad request', 'error': str(e)}, 400
+
+    @app.errorhandler(404)
+    def not_found(e):
+        return {'success': False, 'message': 'Not found', 'error': str(e)}, 404
+
+    @app.errorhandler(405)
+    def method_not_allowed(e):
+        return {'success': False, 'message': 'Method not allowed', 'error': str(e)}, 405
+
+    @app.errorhandler(500)
+    def internal_error(e):
+        return {'success': False, 'message': 'Internal server error', 'error': str(e)}, 500
+
+    @app.errorhandler(Exception)
+    def handle_exception(e):
+        # For any uncaught exception, return JSON
+        return {'success': False, 'message': 'An error occurred', 'error': str(e)}, 500
+
     return app
