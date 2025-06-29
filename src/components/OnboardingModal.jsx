@@ -53,10 +53,6 @@ const OnboardingModal = ({ isOpen, onClose }) => {
       setError("Please enter a valid email address");
       return;
     }
-    if (!formData.email.endsWith(".edu")) {
-      setError("Please use your university email address");
-      return;
-    }
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       return;
