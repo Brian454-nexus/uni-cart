@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-const API_BASE = "/backend/api/auth";
+const API_BASE = "/api/auth";
 
 const AuthContext = createContext(undefined);
 
@@ -81,7 +81,9 @@ export const AuthProvider = ({ children }) => {
       return { success: true };
     } catch (error) {
       console.error("Registration error:", error);
-      throw new Error(error.message || "Registration failed. Please try again.");
+      throw new Error(
+        error.message || "Registration failed. Please try again."
+      );
     } finally {
       setLoading(false);
     }
